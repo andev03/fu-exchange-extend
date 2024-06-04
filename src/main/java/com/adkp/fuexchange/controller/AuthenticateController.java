@@ -2,9 +2,8 @@ package com.adkp.fuexchange.controller;
 
 import com.adkp.fuexchange.request.LoginRequest;
 import com.adkp.fuexchange.request.RegisterRequest;
-import com.adkp.fuexchange.response.LoginResponse;
 import com.adkp.fuexchange.response.ResponseObject;
-import com.adkp.fuexchange.service.AuthenticationServiceImpl;
+import com.adkp.fuexchange.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,37 +14,38 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Authentication")
 public class AuthenticateController {
 
-    private final AuthenticationServiceImpl authenticationServiceImpl;
+    private final AuthenticationService authenticationService;
 
     @Autowired
-    public AuthenticateController(AuthenticationServiceImpl authenticationServiceImpl) {
-        this.authenticationServiceImpl = authenticationServiceImpl;
+    public AuthenticateController(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
 
     @PostMapping("/login")
-    public LoginResponse loginStudent(@RequestBody LoginRequest loginRequest) {
+    public ResponseObject<Object> loginStudent(@RequestBody LoginRequest loginRequest) {
         if (
                 loginRequest.getPassword() != null
                         && loginRequest.getUsername() != null
         ) {
-            return authenticationServiceImpl.login(loginRequest);
+            return authenticationService.login(loginRequest);
         }
-        return LoginResponse.builder()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
+        return ResponseObject.builder()
+
+                .status(HttpStatus.BAD_REQUEST.value())
                 .message(HttpStatus.BAD_REQUEST.name())
                 .content("Vui lòng nhập đầy đủ thông tin")
                 .build();
     }
 
     @PostMapping("/register")
-    public ResponseObject registerStudent(@RequestBody RegisterRequest registerRequest) {
+    public ResponseObject<Object> registerStudent(@RequestBody RegisterRequest registerRequest) {
         if (
                 registerRequest.getPassword() != null
                         && registerRequest.getConfirmPassword() != null
                         && registerRequest.getStudentId() != null
                         && registerRequest.getIdentifyNumber() != null
         ) {
-            return authenticationServiceImpl.register(registerRequest);
+            return authenticationService.register(registerRequest);
         }
         return ResponseObject.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -55,15 +55,15 @@ public class AuthenticateController {
     }
 
     @GetMapping("/check-information")
-    public ResponseObject checkInformationRegister(
+    public ResponseObject<Object> checkInformationRegister(
             @RequestParam("studentId") String studentId,
             @RequestParam("identity") String identity
     ) {
-        return authenticationServiceImpl.checkInformationRegister(studentId, identity);
+        return authenticationService.checkInformationRegister(studentId, identity);
     }
 
     @GetMapping("/isRegistered/{studentId}")
-    public LoginResponse IsRegistered(@PathVariable String studentId) {
-        return authenticationServiceImpl.isRegistered(studentId);
+    public ResponseObject<Object> IsRegistered(@PathVariable String studentId) {
+        return authenticationService.isRegistered(studentId);
     }
 }
