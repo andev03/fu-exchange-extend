@@ -3,8 +3,7 @@ package com.adkp.fuexchange.dto;
 import com.adkp.fuexchange.pojo.Payment;
 import com.adkp.fuexchange.pojo.TransactionsStatus;
 import lombok.Data;
-
-import java.util.Date;
+import java.time.LocalDate;
 @Data
 public class TransactionsDTO {
 
@@ -16,7 +15,7 @@ public class TransactionsDTO {
 
     private double totalPrice;
 
-    private Date createTime;
+    private LocalDate createTime;
 
-    private Date completeTime;
+    private LocalDate completeTime;
 }

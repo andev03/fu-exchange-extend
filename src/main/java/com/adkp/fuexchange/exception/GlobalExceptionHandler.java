@@ -2,18 +2,22 @@ package com.adkp.fuexchange.exception;
 
 import com.adkp.fuexchange.response.ResponseObject;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Objects;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseObject usernameNotFoundException() {
+    public ResponseObject<Object> usernameNotFoundException() {
         return ResponseObject.builder()
                 .status(HttpStatus.NOT_FOUND.value())
                 .message(HttpStatus.NOT_FOUND.name())
@@ -22,7 +26,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DataAccessException.class)
-    public ResponseObject dataAccessException(UsernameNotFoundException usernameNotFoundException) {
+    public ResponseObject<Object> dataAccessException(UsernameNotFoundException usernameNotFoundException) {
         return ResponseObject.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message(HttpStatus.INTERNAL_SERVER_ERROR.name())
@@ -40,7 +44,7 @@ public class GlobalExceptionHandler {
 //    }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseObject entityNotFoundException(Exception exception) {
+    public ResponseObject<Object> entityNotFoundException(Exception exception) {
         return ResponseObject.builder()
                 .status(HttpStatus.NOT_FOUND.value())
                 .message(HttpStatus.NOT_FOUND.name())
@@ -49,7 +53,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseObject dataIntegrityViolationException(DataIntegrityViolationException exception) {
+    public ResponseObject<Object> dataIntegrityViolationException(DataIntegrityViolationException exception) {
         return ResponseObject.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(HttpStatus.BAD_REQUEST.name())
@@ -57,4 +61,21 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseObject<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        return ResponseObject.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message(HttpStatus.BAD_REQUEST.name())
+                .content(Objects.requireNonNull(ex.getFieldError()).getDefaultMessage())
+                .build();
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseObject<Object> handleConstraintViolationExceptions(ConstraintViolationException ex) {
+        return ResponseObject.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message(HttpStatus.BAD_REQUEST.name())
+                .content(ex.getLocalizedMessage())
+                .build();
+    }
 }

@@ -1,10 +1,12 @@
 package com.adkp.fuexchange.pojo;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.NoArgsConstructor;
-import java.util.Date;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor(force = true)
@@ -13,6 +15,7 @@ import java.util.Date;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "PostProduct")
+@ToString
 public class PostProduct {
 
     @Id
@@ -37,11 +40,14 @@ public class PostProduct {
 
     private int quantity;
 
-    private Date createDate;
+    private LocalDate createDate;
 
     private String content;
 
-    public PostProduct(Product productId, PostType postTypeId, Campus campusId, PostStatus postStatusId, int quantity, Date createDate) {
+    @OneToMany(mappedBy = "postProductId", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JsonBackReference
+    private List<CartPost> cartPostId;
+    public PostProduct(Product productId, PostType postTypeId, Campus campusId, PostStatus postStatusId, int quantity, LocalDate createDate) {
         this.productId = productId;
         this.postTypeId = postTypeId;
         this.campusId = campusId;

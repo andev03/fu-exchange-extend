@@ -5,8 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
+import java.time.LocalDate;
 @Data
 @NoArgsConstructor(force = true)
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -26,7 +25,15 @@ public class WishList {
     @JoinColumn(name = "registeredStudentId", referencedColumnName = "registeredStudentId")
     private RegisteredStudent registeredStudentId;
 
-    private Date createDate;
+    private LocalDate createDate;
 
     private boolean isActive;
+
+    public WishList(PostProduct postProductId, RegisteredStudent registeredStudentId, LocalDate createDate, boolean isActive) {
+        this.postProductId = postProductId;
+        this.registeredStudentId = registeredStudentId;
+        this.createDate = createDate;
+        this.isActive = isActive;
+    }
+
 }

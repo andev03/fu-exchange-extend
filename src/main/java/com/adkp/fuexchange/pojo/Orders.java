@@ -5,11 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
+import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@ToString
 @Data
 @NoArgsConstructor(force = true)
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -29,25 +29,25 @@ public class Orders {
     @JoinColumn(name = "orderStatusId", referencedColumnName = "orderStatusId")
     private OrderStatus orderStatusId;
 
-    private LocalDate completeDate;
+    private LocalDateTime createDate;
 
-    private LocalDate createDate;
+    private LocalDateTime completeDate;
 
     private String description;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "orderId")
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "orderId")
     @JsonBackReference
     private Payment paymentId;
 
-    @OneToMany(mappedBy = "orderId", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @OneToMany(mappedBy = "orderId", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
     @JsonBackReference
     private List<OrderPostProduct> orderPostProductId;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "orderId")
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "orderId")
     @JsonBackReference
     private Review reviewId;
 
-    public Orders(RegisteredStudent registeredStudentId, OrderStatus orderStatusId, LocalDate completeDate, LocalDate createDate, String description) {
+    public Orders(RegisteredStudent registeredStudentId, OrderStatus orderStatusId, LocalDateTime createDate, LocalDateTime completeDate, String description) {
         this.registeredStudentId = registeredStudentId;
         this.orderStatusId = orderStatusId;
         this.completeDate = completeDate;
