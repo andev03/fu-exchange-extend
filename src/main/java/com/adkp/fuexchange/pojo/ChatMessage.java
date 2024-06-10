@@ -2,15 +2,19 @@ package com.adkp.fuexchange.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor(force = true)
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
+@AllArgsConstructor
+@Builder
 @Table(name = "ChatMessage")
 public class ChatMessage {
     @Id
@@ -22,22 +26,14 @@ public class ChatMessage {
     private ChatRoom chatRoomId;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "registeredStudentId", referencedColumnName = "registeredStudentId", insertable = false, updatable = false)
+    @JoinColumn(name = "studentSendId", referencedColumnName = "registeredStudentId")
     private RegisteredStudent studentSendId;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "registeredStudentId", referencedColumnName = "registeredStudentId", insertable = false, updatable = false)
+    @JoinColumn(name = "studentReceiveId", referencedColumnName = "registeredStudentId")
     private RegisteredStudent studentReceiveId;
 
     private String content;
 
-    private LocalDate timeSend;
-
-    public ChatMessage(ChatRoom chatRoomId, RegisteredStudent studentSendId, RegisteredStudent studentReceiveId, String content, LocalDate timeSend) {
-        this.chatRoomId = chatRoomId;
-        this.studentSendId = studentSendId;
-        this.studentReceiveId = studentReceiveId;
-        this.content = content;
-        this.timeSend = timeSend;
-    }
+    private LocalDateTime timeSend;
 }
