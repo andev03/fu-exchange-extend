@@ -40,10 +40,10 @@ public class ProductController {
     }
 
     @PutMapping("/update-information")
-    public ResponseObject<Object> UpdateInformation(@RequestBody UpdateInformationProductRequest updateInformationProductRequest
+    public ResponseObject<Object> updateInformation(@RequestBody UpdateInformationProductRequest updateInformationProductRequest
     ) {
 
-        if (updateInformationProductRequest.getProductDetailId().getProductName() != null
+        if (updateInformationProductRequest.getProductDetailIdProductName() != null
                 && updateInformationProductRequest.getPrice() >= 0
         ) {
             return productService.updateProductInformation(updateInformationProductRequest);
@@ -55,9 +55,9 @@ public class ProductController {
                 .build();
     }
 
-    @GetMapping("/get-by-variation")
+    @PostMapping("/get-by-variation")
     @Operation(summary = "Get product by variation detail")
-    public ResponseObject<Object> getProductVariationId(@RequestParam List<Integer> variationDetailId) {
+    public ResponseObject<Object> getProductVariationId(@RequestBody List<Integer> variationDetailId) {
 
         return ResponseObject.builder()
                 .status(HttpStatus.OK.value())
