@@ -11,5 +11,5 @@ public interface RegisteredStudentService {
 
     ResponseObject<Object> updatePassword(UpdatePasswordRequest updatePasswordRequest);
 
-    OrderDetailResponse getOrdersDetailByRegisteredStudentId(Integer registeredStudentId, Integer orderId, Integer orderStatusId);
+    OrderDetailResponse getOrdersDetailByRegisteredStudentId(Integer registeredStudentId, Integer orderId);
 }

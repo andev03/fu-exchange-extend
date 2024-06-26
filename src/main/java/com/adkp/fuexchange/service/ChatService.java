@@ -2,9 +2,8 @@ package com.adkp.fuexchange.service;
 
 import com.adkp.fuexchange.dto.ChatMessageDTO;
 import com.adkp.fuexchange.dto.ChatRoomDTO;
-import com.adkp.fuexchange.pojo.ChatMessage;
 import com.adkp.fuexchange.request.ChatRequest;
-import com.adkp.fuexchange.request.ContactToSellerRequest;
+import com.adkp.fuexchange.request.ContactToRequest;
 
 import java.util.List;
 
@@ -14,7 +13,9 @@ public interface ChatService {
 
     ChatMessageDTO sendChatMessage(ChatRequest chatRequest);
 
-    ChatRoomDTO getChatRoomByRegisteredStudentIdAndSellerId(Integer registeredStudentId, Integer sellerId);
+    ChatRoomDTO getChatRoomStudentToStudent(Integer studentSendId, Integer studentReceiveId);
 
-    ChatMessageDTO contactToSeller(ContactToSellerRequest contactToSellerRequest);
+    ChatMessageDTO contactToSeller(ContactToRequest contactToRequest);
+
+    ChatMessageDTO contactToStudent(ContactToRequest contactToRequest);
 }

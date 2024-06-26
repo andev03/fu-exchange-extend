@@ -3,7 +3,7 @@ package com.adkp.fuexchange.controller;
 import com.adkp.fuexchange.dto.ChatMessageDTO;
 import com.adkp.fuexchange.dto.ChatRoomDTO;
 import com.adkp.fuexchange.request.ChatRequest;
-import com.adkp.fuexchange.request.ContactToSellerRequest;
+import com.adkp.fuexchange.request.ContactToRequest;
 import com.adkp.fuexchange.response.ResponseObject;
 import com.adkp.fuexchange.service.ChatService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,15 +51,15 @@ public class ChatController {
                 .build();
     }
 
-    @GetMapping("/chat-room/student-to-seller")
+    @GetMapping("/chat-room/student-to-student")
     public ResponseObject<Object> getChatRoomByRegisteredStudentIdAndSellerId(
-            @RequestParam("registeredStudentId") int registeredStudentId,
-            @RequestParam("sellerId") int sellerId
+            @RequestParam("studentSendId") int studentSendId,
+            @RequestParam("studentReceiveId") int studentReceiveId
     ) {
 
         String content = "Xem thông tin thành công!";
 
-        ChatRoomDTO chatRoom = chatService.getChatRoomByRegisteredStudentIdAndSellerId(registeredStudentId, sellerId);
+        ChatRoomDTO chatRoom = chatService.getChatRoomStudentToStudent(studentSendId, studentReceiveId);
 
         if (chatRoom == null) {
             content = "Đoạn chat đã bị xóa hoặc chưa có tin nhắn nào được gửi!";
@@ -97,13 +97,36 @@ public class ChatController {
     }
 
     @PostMapping("/contact-to-seller")
-    public ResponseObject<Object> sendMessage(@RequestBody @Valid ContactToSellerRequest contactToSellerRequest) {
+    public ResponseObject<Object> contactToSeller(@RequestBody @Valid ContactToRequest contactToSellerRequest) {
 
         int status = HttpStatus.OK.value();
         String message = (HttpStatus.OK.name());
         String content = "Gửi tin nhắn thành công!";
 
         ChatMessageDTO chatMessageDTO = chatService.contactToSeller(contactToSellerRequest);
+
+        if (chatMessageDTO == null) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR.value();
+            message = (HttpStatus.INTERNAL_SERVER_ERROR.name());
+            content = "Gửi tin nhắn thất bại!";
+        }
+
+        return ResponseObject.builder()
+                .status(status)
+                .message(message)
+                .content(content)
+                .data(chatMessageDTO)
+                .build();
+    }
+
+    @PostMapping("/contact-to-student")
+    public ResponseObject<Object> contactToStudent(@RequestBody @Valid ContactToRequest contactToRequest) {
+
+        int status = HttpStatus.OK.value();
+        String message = (HttpStatus.OK.name());
+        String content = "Gửi tin nhắn thành công!";
+
+        ChatMessageDTO chatMessageDTO = chatService.contactToStudent(contactToRequest);
 
         if (chatMessageDTO == null) {
             status = HttpStatus.INTERNAL_SERVER_ERROR.value();

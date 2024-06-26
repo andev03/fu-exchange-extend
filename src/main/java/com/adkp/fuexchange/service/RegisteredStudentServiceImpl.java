@@ -1,10 +1,8 @@
 package com.adkp.fuexchange.service;
 
 import com.adkp.fuexchange.dto.OrderPostProductDTO;
-import com.adkp.fuexchange.dto.OrdersDTO;
 import com.adkp.fuexchange.dto.RegisteredStudentDTO;
 import com.adkp.fuexchange.mapper.OrderPostProductMapper;
-import com.adkp.fuexchange.mapper.OrdersMapper;
 import com.adkp.fuexchange.mapper.RegisteredStudentMapper;
 import com.adkp.fuexchange.pojo.Orders;
 import com.adkp.fuexchange.pojo.Payment;
@@ -42,10 +40,8 @@ public class RegisteredStudentServiceImpl implements RegisteredStudentService {
 
     private final TransactionsRepository transactionsRepository;
 
-    private final OrdersMapper ordersMapper;
-
     @Autowired
-    public RegisteredStudentServiceImpl(RegisteredStudentRepository registeredStudentRepository, RegisteredStudentMapper registeredStudentMapper, PasswordEncoder passwordEncoder, OrderPostProductRepository orderPostProductRepository, OrderPostProductMapper orderPostProductMapper, OrdersRepository ordersRepository, PaymentRepository paymentRepository, TransactionsRepository transactionsRepository, OrdersMapper ordersMapper) {
+    public RegisteredStudentServiceImpl(RegisteredStudentRepository registeredStudentRepository, RegisteredStudentMapper registeredStudentMapper, PasswordEncoder passwordEncoder, OrderPostProductRepository orderPostProductRepository, OrderPostProductMapper orderPostProductMapper, OrdersRepository ordersRepository, PaymentRepository paymentRepository, TransactionsRepository transactionsRepository) {
         this.registeredStudentRepository = registeredStudentRepository;
         this.registeredStudentMapper = registeredStudentMapper;
         this.passwordEncoder = passwordEncoder;
@@ -54,7 +50,6 @@ public class RegisteredStudentServiceImpl implements RegisteredStudentService {
         this.ordersRepository = ordersRepository;
         this.paymentRepository = paymentRepository;
         this.transactionsRepository = transactionsRepository;
-        this.ordersMapper = ordersMapper;
     }
 
     @Override
@@ -94,7 +89,7 @@ public class RegisteredStudentServiceImpl implements RegisteredStudentService {
     }
 
     @Override
-    public OrderDetailResponse getOrdersDetailByRegisteredStudentId(Integer registeredStudentId, Integer orderId, Integer orderStatusId) {
+    public OrderDetailResponse getOrdersDetailByRegisteredStudentId(Integer registeredStudentId, Integer orderId) {
 
         List<OrderPostProductDTO> orderPostProductList =
                 orderPostProductMapper.toOrderPostProductDTOList(orderPostProductRepository.getOrdersDetailByRegisteredStudentId(registeredStudentId, orderId));

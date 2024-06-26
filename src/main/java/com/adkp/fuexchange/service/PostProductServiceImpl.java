@@ -6,6 +6,7 @@ import com.adkp.fuexchange.pojo.*;
 import com.adkp.fuexchange.repository.*;
 import com.adkp.fuexchange.request.CreatePostProductRequest;
 import com.adkp.fuexchange.request.UpdatePostProductRequest;
+import com.adkp.fuexchange.request.UpdatePostStatus;
 import com.adkp.fuexchange.response.MetaResponse;
 import com.adkp.fuexchange.response.ResponseObject;
 import jakarta.transaction.Transactional;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,7 +66,7 @@ public class PostProductServiceImpl implements PostProductService {
                 .message(HttpStatus.OK.name())
                 .content("Xem thêm thành công!")
                 .data(postProductDTO)
-                .meta(new MetaResponse(countPostProduct(campusId, postTypeId, name, categoryId, postProductDTO), current))
+                .meta(new MetaResponse((countPostProduct(campusId, postTypeId, name, categoryId, postProductDTO)), current))
                 .build();
     }
 
@@ -91,6 +93,36 @@ public class PostProductServiceImpl implements PostProductService {
                 .message(HttpStatus.OK.name())
                 .content("Xem thông tin thành công!")
                 .data(postProductDTO)
+                .build();
+    }
+
+    @Override
+    public ResponseObject<Object> getPostProductBySellerId(int sellerID) {
+        List<PostProductDTO> postProductDTOList = new ArrayList<>();
+        List<PostProduct> postProductList = postProductRepository.getPostProductBySellerId(sellerID);
+        for (PostProduct postProduct : postProductList) {
+            postProductDTOList.add(postProductMapper.toPostProductDTO(postProduct));
+        }
+        return ResponseObject.builder()
+                .status(HttpStatus.OK.value())
+                .message(HttpStatus.OK.name())
+                .content("Xem thông tin thành công!")
+                .data(postProductDTOList)
+                .build();
+    }
+
+    @Override
+    public ResponseObject<Object> getPostProductByRegisteredStudentId(int registeredStudentId) {
+        List<PostProductDTO> postProductDTOList = new ArrayList<>();
+        List<PostProduct> postProductList = postProductRepository.getPostProductByRegisteredStudentId(registeredStudentId);
+        for (PostProduct postProduct : postProductList) {
+            postProductDTOList.add(postProductMapper.toPostProductDTO(postProduct));
+        }
+        return ResponseObject.builder()
+                .status(HttpStatus.OK.value())
+                .message(HttpStatus.OK.name())
+                .content("Xem thông tin thành công!")
+                .data(postProductDTOList)
                 .build();
     }
 
@@ -146,6 +178,37 @@ public class PostProductServiceImpl implements PostProductService {
                                 .build()
                 )
         );
+    }
+
+    @Override
+    public PostProductDTO updateStatusPostProduct(UpdatePostStatus updatePostStatus) {
+        PostProduct postProduct = postProductRepository.getReferenceById(updatePostStatus.getPostProductId());
+
+        PostStatus postStatus = postStatusRepository.getReferenceById(updatePostStatus.getPostStatusId());
+
+        postProduct.setPostStatusId(postStatus);
+
+        return postProductMapper.toPostProductDTO(postProductRepository.save(postProduct));
+    }
+
+    @Override
+    public List<PostProductDTO> filterPostProductForStaff(Integer page, String sellerName, Integer postTypeId, Integer campusId, Integer postStatusId) {
+        Pageable pageable = PageRequest.of(page, 6);
+
+        String seller = Optional.ofNullable(sellerName).map(String::valueOf).orElse("");
+        String postType = Optional.ofNullable(postTypeId).map(String::valueOf).orElse("");
+        String campus = Optional.ofNullable(campusId).map(String::valueOf).orElse("");
+        String postStatus = Optional.ofNullable(postStatusId).map(String::valueOf).orElse("");
+
+        List<PostProduct> postProduct = postProductRepository.filterPostProductForStaff(
+                pageable, seller, postType, campus, postStatus
+        );
+        return postProductMapper.toPostProductDTOList(postProduct);
+    }
+
+    @Override
+    public long countAllPostProduct() {
+        return postProductRepository.count();
     }
 
     public long countPostProduct(Integer campusId, Integer postTypeId, String name, Integer categoryId, List<PostProductDTO> postProductDTOList) {

@@ -36,7 +36,6 @@ public class Payment {
     @JsonBackReference
     private List<Orders> orderId;
 
-
     public Payment(PaymentMethod paymentMethodId, boolean paymentStatus, LocalDateTime createTime) {
         this.paymentMethodId = paymentMethodId;
         this.paymentStatus = paymentStatus;
