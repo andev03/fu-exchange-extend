@@ -11,8 +11,7 @@ import java.util.List;
 public interface OrderPostProductRepository extends JpaRepository<OrderPostProduct, Integer> {
 
     @Query("SELECT odpprd.orderId From OrderPostProduct odpprd WHERE " +
-            "odpprd.postProductId.productId.sellerId.sellerId = :sellerId " +
-            "AND odpprd.orderId.orderStatusId.orderStatusId = 2")
+            "odpprd.postProductId.productId.sellerId.sellerId = :sellerId")
     List<Orders> getOrdersBySellerId(@Param("sellerId") Integer sellerId);
 
     @Query("SELECT odpprd FROM OrderPostProduct odpprd " +
@@ -34,4 +33,10 @@ public interface OrderPostProductRepository extends JpaRepository<OrderPostProdu
             "odpprd.postProductId.postProductId = :postProductId ")
     List<OrderPostProduct> getOrdersPostProductId(@Param("postProductId") Integer postProductId);
 
+    @Query("SELECT COUNT(odpprd) From OrderPostProduct odpprd WHERE " +
+            "odpprd.postProductId.postProductId = :postProductId " +
+            "AND orderId.orderStatusId.orderStatusId IN (1, 2, 3)")
+    long checkOrderInDeletePost(
+            @Param("postProductId") Integer postProductId
+    );
 }

@@ -38,8 +38,10 @@ public class PostProductServiceImpl implements PostProductService {
 
     private final ReviewRepository reviewRepository;
 
+    private final OrderPostProductRepository orderPostProductRepository;
+
     @Autowired
-    public PostProductServiceImpl(PostProductRepository postProductRepository, PostProductMapper postProductMapper, ProductRepository productRepository, PostTypeRepository postTypeRepository, PostStatusRepository postStatusRepository, CampusRepository campusRepository, ReviewRepository reviewRepository) {
+    public PostProductServiceImpl(PostProductRepository postProductRepository, PostProductMapper postProductMapper, ProductRepository productRepository, PostTypeRepository postTypeRepository, PostStatusRepository postStatusRepository, CampusRepository campusRepository, ReviewRepository reviewRepository, OrderPostProductRepository orderPostProductRepository) {
         this.postProductRepository = postProductRepository;
         this.postProductMapper = postProductMapper;
         this.productRepository = productRepository;
@@ -47,6 +49,7 @@ public class PostProductServiceImpl implements PostProductService {
         this.postStatusRepository = postStatusRepository;
         this.campusRepository = campusRepository;
         this.reviewRepository = reviewRepository;
+        this.orderPostProductRepository = orderPostProductRepository;
     }
 
     @Override
@@ -66,7 +69,12 @@ public class PostProductServiceImpl implements PostProductService {
                 .message(HttpStatus.OK.name())
                 .content("Xem thêm thành công!")
                 .data(postProductDTO)
-                .meta(new MetaResponse((countPostProduct(campusId, postTypeId, name, categoryId, postProductDTO)), current))
+                .meta(
+                        MetaResponse.builder()
+                                .total(countPostProduct(campusId, postTypeId, name, categoryId, postProductDTO))
+                                .current(current)
+                                .build()
+                )
                 .build();
     }
 
@@ -130,6 +138,13 @@ public class PostProductServiceImpl implements PostProductService {
     @Transactional
     public PostProductDTO updatePostProduct(UpdatePostProductRequest updatePostProductRequest) {
 
+        PostStatus postStatus = postStatusRepository.getReferenceById(updatePostProductRequest.getPostStatusId());
+        if (
+                postStatus.getPostStatusId() == 5 &&
+                        orderPostProductRepository.checkOrderInDeletePost(updatePostProductRequest.getPostProductId()) != 0
+        ) {
+            return null;
+        }
         PostProduct postProduct = postProductRepository.getReferenceById(updatePostProductRequest.getPostProductId());
 
         Product product = productRepository.getReferenceById(updatePostProductRequest.getProductId());
@@ -143,6 +158,8 @@ public class PostProductServiceImpl implements PostProductService {
         postProduct.setPostTypeId(postType);
 
         postProduct.setCampusId(campus);
+
+        postProduct.setPostStatusId(postStatus);
 
         postProduct.setQuantity(updatePostProductRequest.getQuantity());
 
@@ -207,8 +224,16 @@ public class PostProductServiceImpl implements PostProductService {
     }
 
     @Override
-    public long countAllPostProduct() {
-        return postProductRepository.count();
+    public long totalAfterFilter(String sellerName, Integer postTypeId, Integer campusId, Integer postStatusId) {
+
+        String seller = Optional.ofNullable(sellerName).map(String::valueOf).orElse("");
+        String postType = Optional.ofNullable(postTypeId).map(String::valueOf).orElse("");
+        String campus = Optional.ofNullable(campusId).map(String::valueOf).orElse("");
+        String postStatus = Optional.ofNullable(postStatusId).map(String::valueOf).orElse("");
+
+        return postProductRepository.totalAfterFilter(
+                seller, postType, campus, postStatus
+        );
     }
 
     public long countPostProduct(Integer campusId, Integer postTypeId, String name, Integer categoryId, List<PostProductDTO> postProductDTOList) {

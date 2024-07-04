@@ -71,4 +71,30 @@ public interface PostProductRepository extends JpaRepository<PostProduct, Intege
             @Param("campusId") String campusId,
             @Param("postStatusId") String postStatusId
     );
+
+    @Query(value = "SELECT COUNT(pprd.postProductId) FROM PostProduct pprd " +
+            "JOIN Product p ON pprd.productId = p.productId " +
+            "JOIN Seller sl ON p.sellerId = sl.sellerId " +
+            "JOIN RegisteredStudent rgtstd ON sl.registeredStudentId = rgtstd.registeredStudentId " +
+            "JOIN Student std ON rgtstd.studentId = std.studentId " +
+            "WHERE CONCAT(std.firstName, ' ' , std.lastName) " +
+            "LIKE CONCAT('%', :sellerName, '%') " +
+            "AND pprd.postTypeId LIKE CONCAT('%', :postTypeId, '%') " +
+            "AND pprd.campusId LIKE CONCAT('%', :campusId, '%') " +
+            "AND pprd.postStatusId LIKE CONCAT('%', :postStatusId, '%')",
+            nativeQuery = true
+    )
+    long totalAfterFilter(
+            @Param("sellerName") String sellerName,
+            @Param("postTypeId") String postTypeId,
+            @Param("campusId") String campusId,
+            @Param("postStatusId") String postStatusId
+    );
+
+    @Query("SELECT COUNT(pprd) FROM PostProduct pprd " +
+            "WHERE pprd.productId.productId = :productId " +
+            "AND pprd.postStatusId.postStatusId IN (2, 4)")
+    long checkProductInPost(
+        @Param("productId") Integer productId
+    );
 }
